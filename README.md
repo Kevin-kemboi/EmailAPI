@@ -1,4 +1,4 @@
-git clone https://github.com/Sanskargupta0/Email-Send-API.git
+
 ## Email Send API
 
 > Live Deployment: <https://emailapi-o5je.onrender.com>
