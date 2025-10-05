@@ -1,158 +1,132 @@
-# [SendMail API](https://github.com/Sanskargupta0/Email-Send-API.git) &middot; [![Author Sanskar Gupta](https://img.shields.io/badge/Author-Sanskar-%3C%3E)](https://www.linkedin.com/in/sanskar-gupta-12476423b/)
+git clone https://github.com/Sanskargupta0/Email-Send-API.git
+## Email Send API
 
-This API enables sending dynamic emails using customizable templates, including support for file attachments. It can be used for various use cases such as sending quotations, contact form submissions, and more.
+> Live Deployment: <https://emailapi-o5je.onrender.com>
+
+Fork adapted from the original SendMail API project. This service provides templated email sending (subscription, contact, quotation) with Gmail OAuth2 + Nodemailer.
 
 ## Features
 
-- Send dynamic emails with attachments.
-- Configurable email templates (quotations, contact forms, etc.).
-- Secure handling of environment variables for Gmail OAuth2 authentication.
-- Built with Node.js and Express.
+- Dynamic HTML + text email templates
+- Dual delivery (internal admin + user confirmation)
+- Gmail OAuth2 (no plain passwords)
+- File attachment handling (quotation artwork)
+- Simple JSON REST endpoints
 
-## Tech/framework used
+## Tech Stack
 
-- Node.js
-- Express
-- Nodemailer
-- OAuth2 for Gmail Integration
-- dotenv for environment configuration
+| Layer | Tool |
+|-------|------|
+| Runtime | Node.js |
+| Framework | Express |
+| Mail | Nodemailer + Gmail OAuth2 |
+| Uploads | Multer |
+| Config | dotenv |
 
-## Endpoints
+## Endpoints Overview
 
-### `GET /`
-Returns a health check message for the API.
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET | / | Basic service response |
+| GET | /health | Health check |
+| POST | /subscribe-email | Newsletter subscription |
+| POST | /contact-number | Collect mobile number only |
+| POST | /contact-email | Full contact form submission |
+| POST | /quotation-email | Quotation with optional file upload |
 
-#### Response: (Success)
+### Example: Subscribe
+
+Request:
+
+```json
+{ "email": "user@example.com" }
+```
+
+Response:
+
+```json
+{ "message": "Email sent successfully" }
+```
+
+### Example: Contact
+
 ```json
 {
-  "message": "Email Service Health Check"
+  "name": "Jane Doe",
+  "email": "jane@example.com",
+  "message": "Need pricing details",
+  "subject": "Pricing",
+  "mobile": "+1234567890"
 }
 ```
 
-![Health Check Image](/screenshots/health-check.png)
+### Example: Quotation multipart fields
 
-### `POST /subscribe-email`
-Sends a subscription email to the provided email address.
-
-#### Request:
-```json
-{
-  "email": "user@example.com"
-}
+```text
+id, productName, lengthh, width, height (optional), quantity, dynamicFields (JSON string), note, artworkName, name, email, phone, estimatedPrice, artwork (file)
 ```
 
-#### Response: (Success)
-```json
-{
-    "message": "Email sent successfully"
-}
-```
+## Environment Variables
 
-![Subscription Email Image](/screenshots/subscription-email-API.png)
+Create a `.env`:
 
-### `POST /contact-email`
-Sends a contact form email with the provided details.
-
-#### Request:
-```json
-{
-  "name": "John Doe",
-  "email": "johndoe@example.com",
-  "message": "Hello, I need some help.",
-  "subject": "Help Request",
-  "mobile": "123-456-7890"
-}
-```
-
-#### Response: (Success)
-```json
-{
-    "message": "Email sent successfully"
-}
-```
-
-![Contact Form Email Image](/screenshots/contact-form-email-API.png)
-
-### `POST /quotation-email`
-Sends a quotation email with the provided product details.
-
-#### Request:
-```json
-{
-  "id": "12345",
-  "productName": "Custom Printed Box",
-  "lengthh": "10",
-  "width": "8",
-  "quantity": "100",
-  "material": "Cardboard",
-  "finishes": ["Glossy", "Matte"],
-  "extra": ["Die-cut", "Embossing"],
-  "note": "Please ensure high durability for the packaging.",
-  "artwork": "sample-artwork-file.jpg",
-  "name": "John Doe",
-  "email": "johndoe@example.com",
-  "phone": "123-456-7890",
-  "artwork": "sample-artwork-file.jpg" // File of the artwork
-}
-
-```
-
-#### Response: (Success)
-```json
-{
-    "message": "Email sent successfully"
-}
-```
-
-![Quotation Email Image](/screenshots/quotation-email-API.png)
-
-## Starting the project
-
-Open the [.env.example](/.env.example) and fill in your key then save it as .env 
-
-```plaintext
-CLIENT_ID="Your Client Id"
-CLIENT_SECRET="Your Client Secret"
+```dotenv
+CLIENT_ID="Your Google OAuth Client Id"
+CLIENT_SECRET="Your Google OAuth Client Secret"
 REDIRECT_URL="https://developers.google.com/oauthplayground"
-REFRESH_TOKEN="Your Refresh Token"
-CarbonCopy="Your Admin Email ID"
+REFRESH_TOKEN="Your Gmail API Refresh Token"
+CarbonCopy="admin@yourdomain.com"
 PORT=3000
 FRONTEND_URL="http://localhost:5173"
+NODE_ENV="development"
 ```
 
-then run the following command:
+### Getting OAuth2 Credentials (Gmail)
+
+1. Google Cloud Console → Create project
+2. Enable Gmail API
+3. Configure OAuth consent screen (External)
+4. Create OAuth Client (Web) with redirect URI: `https://developers.google.com/oauthplayground`
+5. Use OAuth Playground with scope: `https://www.googleapis.com/auth/gmail.send`
+6. Exchange code → copy Refresh Token into `.env`
+
+## Run Locally
 
 ```bash
-# clone the repo
-git clone https://github.com/Sanskargupta0/Email-Send-API.git
-cd Email-Send-API
+git clone https://github.com/Kevin-kemboi/EmailAPI.git
+cd EmailAPI
+cp .env.example .env # then edit secrets
 npm install
-# then to run the server
-node index.js
+npm start
 ```
 
-## Demo
+## Test Commands
 
-Check out the live API Endpoint of [SendMail API](https://email-send-api-67qp.onrender.com/) for a demo. You can use the provided endpoints to send emails with attachments and customize the email templates. The API is designed to be secure and reliable, with support for OAuth2 for Gmail integration and environment variables for configuration. The project is built with Node.js and Express, and is designed to be scalable and maintainable. The API is also designed to be easy to use and integrate with other applications, making it a popular choice for businesses and organizations looking to send dynamic emails. The project is also designed to be easy to maintain and update
+```bash
+curl https://emailapi-o5je.onrender.com/health
+curl -X POST https://emailapi-o5je.onrender.com/subscribe-email \
+  -H "Content-Type: application/json" \
+  -d '{"email":"user@example.com"}'
+```
 
-## Screenshots
+## Deployment (Render)
 
-### Subscription Email
-#### User side Email
-![Subscription User side Email](/screenshots/subscription-email.png)
-#### Admin side Email
-![Subscribed Admin side Email](/screenshots/subscribed-email.png)
-### Contact Form Email
-#### User side Email
-![Contact Form User Email](/screenshots/contact-form-email.png)
-#### Admin side Email
-![Contact Form Admin side Email](/screenshots/contact-form-admin-email.png)
-### Quotation Email
-#### User side Email
-![Quotation User side Email](/screenshots/quotation-email.png)
-#### Admin side Email
-![Quotation Admin side Email](/screenshots/quotation-admin-email.png)
+Build Command: `npm install`
 
+Start Command: `npm start`
 
+Add the environment variables in the Render dashboard. The platform injects `PORT` automatically.
 
-"# EmailAPI" 
+## Production Notes
+
+- Filesystem is ephemeral; attachments are removed after send.
+- Consider memory storage or external object storage for larger files.
+- Add rate limiting & validation for public exposure.
+- Use proper logging (e.g., morgan) if scaling.
+
+## License
+
+MIT (attribution retained where applicable).
+
+---
+Maintained by Kevin-kemboi.
